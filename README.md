@@ -1,26 +1,46 @@
-# Work Calculator
+# Kalkulator Kurierów
 
-Mobilna aplikacja JS (responsywna strona webowa) do rozliczania wypłat kurierów.
+Prosta aplikacja webowa (mobile-first) do rozliczania pracy kurierów.
 
-## Uruchomienie
+## Co potrafi aplikacja
 
-1. Otwórz plik `index.html` w przeglądarce.
-2. Na telefonie możesz uruchomić ten sam plik przez lokalny serwer (np. Live Server w VS Code).
+- Dodawanie i usuwanie pracowników.
+- Edycja stawek pracownika (godzinowej i za zamówienie) w panelu zarządzania.
+- Szybkie liczenie pojedynczego pracownika oraz łącznej wypłaty dla wszystkich.
+- Obsługa nocnych zmian (np. `11:00 → 02:00`) jako jeden dzień pracy.
+- Historia dni z podglądem szczegółów w popupie.
+- Automatyczny zapis danych w `localStorage`.
 
-## Funkcje
+## Jak liczone są wypłaty
 
-- Dodawanie pracownika: imię, stawka godzinowa, stawka za zamówienie, godzina rozpoczęcia/zakończenia, liczba zamówień.
-- Usuwanie pracownika.
-- Indywidualne obliczenie przyciskiem obok pracownika.
-- Obliczenie zbiorcze przyciskiem **"Oblicz łączną wypłatę"**.
-- Szczegółowy podgląd wszystkich kurierów przyciskiem **"Pokaż wszystkich kurierów"**.
-- Automatyczny zapis bieżących pracowników w `localStorage` (dane zostają po odświeżeniu).
-- Historia dni: można wybrać datę, zapisać dzień i otworzyć go osobnym przyciskiem daty.
+- `godziny = koniec - start`
+- jeśli `koniec < start`, aplikacja traktuje koniec jako następny dzień
+- `wypłata_za_godziny = godziny × stawka_godzinowa`
+- `wypłata_za_zamówienia = liczba_zamówień × stawka_za_zamówienie`
+- jeśli brak liczby zamówień, część za zamówienia = `0`
+- `razem = wypłata_za_godziny + wypłata_za_zamówienia`
 
-## Logika obliczeń
+## Uruchomienie lokalnie
 
-- Godziny = czas zakończenia - czas rozpoczęcia (jeśli zmiana przechodzi przez północ, jest liczona poprawnie).
-- Wypłata za godziny = godziny × stawka godzinowa.
-- Wypłata za zamówienia = liczba zamówień × stawka za zamówienie.
-- Jeśli liczba zamówień nie jest podana, wypłata za zamówienia = 0.
-- Razem = wypłata za godziny + wypłata za zamówienia.
+1. Sklonuj repozytorium.
+2. Otwórz `index.html` w przeglądarce
+   lub uruchom przez lokalny serwer (np. Live Server w VS Code).
+
+## Publikacja na GitHub Pages
+
+Repozytorium jest przygotowane do publikacji z gałęzi `gh-pages`.
+
+1. Wejdź w `Settings` → `Pages`.
+2. Wybierz `Deploy from a branch`.
+3. Ustaw gałąź `gh-pages` i folder `/ (root)`.
+4. Zapisz ustawienia i poczekaj na link publikacji.
+
+Docelowy adres zwykle ma formę:
+
+`https://widthdoctor.github.io/workcalculator/`
+
+## Struktura projektu
+
+- `index.html` — interfejs aplikacji
+- `styles.css` — stylowanie
+- `app.js` — logika aplikacji, obliczenia i zapis danych
