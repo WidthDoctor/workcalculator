@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalkulator kurierów</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <main class="app">
+        <header class="app__header">
+            <div class="app__header-row">
+                <div>
+                    <h1>Kalkulator kurierów</h1>
+                    <p>Ewidencja godzin i zamówień dla każdego pracownika</p>
+                </div>
+                <div class="header-actions">
+                    <button id="historyQuickOpen" class="btn btn-secondary" type="button" aria-label="Otwórz historię">
+                        Historia
+                    </button>
+                    <button id="menuToggle" class="btn btn-secondary burger-btn" type="button" aria-expanded="false"
+                        aria-controls="managerPanel" aria-label="Otwórz menu zarządzania">
+                        <span class="burger-btn__lines" aria-hidden="true">
+                            <span></span><span></span><span></span>
+                        </span>
+                        <span>Menu</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <section id="managerPanel" class="panel hidden">
+            <h2>Zarządzanie pracownikami</h2>
+            <form id="employeeForm" class="form-grid">
+                <label>
+                    Imię
+                    <input type="text" id="name" placeholder="Np. Jan" required />
+                </label>
+                <label>
+                    Stawka za godzinę (zł)
+                    <input type="number" id="hourlyRate" min="0" step="0.01" placeholder="0" />
+                </label>
+                <label>
+                    Stawka za zamówienie (zł)
+                    <input type="number" id="orderRate" min="0" step="0.01" placeholder="0" />
+                </label>
+                <button type="submit" class="btn btn-primary btn-icon" aria-label="Dodaj pracownika">
+                    <span class="btn-icon__svg" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="8" r="4"></circle>
+                            <path d="M2 20c0-3.5 3-6 7-6"></path>
+                            <path d="M18 8v6"></path>
+                            <path d="M15 11h6"></path>
+                            <path d="M19.8 18.2l1.2.7"></path>
+                            <path d="M17 19.8v1.4"></path>
+                            <path d="M14.2 18.2l-1.2.7"></path>
+                            <path d="M14.2 15.8l-1.2-.7"></path>
+                            <path d="M17 14.2v-1.4"></path>
+                            <path d="M19.8 15.8l1.2-.7"></path>
+                        </svg>
+                    </span>
+                    <span>Dodaj pracownika</span>
+                </button>
+            </form>
+
+            <h2>Edytuj / usuń</h2>
+            <div id="managerEmployeesList" class="employees"></div>
+
+            <h2>Historia dni</h2>
+            <div class="history-controls">
+                <label>
+                    Data
+                    <input type="date" id="historyDate" />
+                </label>
+                <button id="saveDay" class="btn btn-primary">Zapisz dzień do historii</button>
+            </div>
+            <div class="history-select" id="historySelect">
+                <button id="historySelectTrigger" class="history-select__trigger" type="button">Wybierz dzień</button>
+                <div id="historySelectMenu" class="history-select__menu hidden"></div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="actions">
+                <button id="calculateAll" class="btn btn-primary">Oblicz łączną wypłatę</button>
+                <button id="toggleAll" class="btn btn-secondary">Pokaż wszystkich kurierów</button>
+            </div>
+            <p class="hint">Nocne zmiany są obsługiwane automatycznie: jeśli koniec jest wcześniejszy niż początek (np.
+                22:00 →
+                02:00), obliczenie działa bez błędu.</p>
+            <div id="employeesList" class="employees"></div>
+        </section>
+
+    </main>
+
+    <div id="allReport" class="modal modal--full-mobile hidden" role="dialog" aria-modal="true"
+        aria-labelledby="allReportTitle">
+        <div class="modal__backdrop" data-close-all-report="true"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="allReportTitle">Szczegóły dla wszystkich kurierów</h3>
+                <button id="allReportClose" class="btn btn-secondary" type="button">Zamknij</button>
+            </div>
+            <div id="allReportContent"></div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+        <div class="modal__backdrop" data-close-modal="true"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h3 id="historyModalTitle">Statystyka dnia</h3>
+                <button id="historyModalClose" class="btn btn-secondary" type="button">Zamknij</button>
+            </div>
+            <div id="historyModalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
