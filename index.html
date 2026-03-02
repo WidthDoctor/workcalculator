@@ -70,22 +70,12 @@
             <div id="managerEmployeesList" class="employees"></div>
 
             <h2>Historia dni</h2>
-            <div class="history-controls">
-                <label>
-                    Data
-                    <input type="date" id="historyDate" />
-                </label>
-                <button id="saveDay" class="btn btn-primary">Zapisz dzień do historii</button>
-            </div>
-            <div class="history-select" id="historySelect">
-                <button id="historySelectTrigger" class="history-select__trigger" type="button">Wybierz dzień</button>
-                <div id="historySelectMenu" class="history-select__menu hidden"></div>
-            </div>
+            <p class="hint">Historia dostępna w oknie popup przez przycisk „Historia” lub „Wynik dnia”.</p>
         </section>
 
         <section class="panel">
             <div class="actions">
-                <button id="calculateAll" class="btn btn-primary">Oblicz łączną wypłatę</button>
+                <button id="calculateAll" class="btn btn-primary">Wynik dnia</button>
                 <button id="toggleAll" class="btn btn-secondary">Pokaż wszystkich kurierów</button>
             </div>
             <p class="hint">Nocne zmiany są obsługiwane automatycznie: jeśli koniec jest wcześniejszy niż początek (np.
@@ -109,13 +99,19 @@
     </div>
 
     <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
-        <div class="modal__backdrop" data-close-modal="true"></div>
+        <div class="modal__backdrop" data-close-history-modal="true"></div>
         <div class="modal__content">
             <div class="modal__header">
-                <h3 id="historyModalTitle">Statystyka dnia</h3>
+                <h3 id="historyModalTitle">Historia dni</h3>
                 <button id="historyModalClose" class="btn btn-secondary" type="button">Zamknij</button>
             </div>
-            <div id="historyModalBody"></div>
+            <div class="history-controls">
+                <label>
+                    Data
+                    <input type="date" id="historyDate" />
+                </label>
+            </div>
+            <div id="historyDaysList" class="history-days"></div>
         </div>
     </div>
 

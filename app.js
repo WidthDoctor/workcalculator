@@ -1,7 +1,7 @@
 const employees = [];
 let dayHistory = [];
 let showAllReport = false;
-let selectedHistoryDate = null;
+let expandedHistoryDate = null;
 const WORKDAY_CUTOFF_HOUR = 4;
 
 const STORAGE_KEYS = {
@@ -21,14 +21,9 @@ const allReport = document.getElementById("allReport");
 const allReportClose = document.getElementById("allReportClose");
 const allReportContent = document.getElementById("allReportContent");
 const historyDateInput = document.getElementById("historyDate");
-const saveDayBtn = document.getElementById("saveDay");
-const historySelect = document.getElementById("historySelect");
-const historySelectTrigger = document.getElementById("historySelectTrigger");
-const historySelectMenu = document.getElementById("historySelectMenu");
+const historyDaysList = document.getElementById("historyDaysList");
 const historyModal = document.getElementById("historyModal");
 const historyModalClose = document.getElementById("historyModalClose");
-const historyModalTitle = document.getElementById("historyModalTitle");
-const historyModalBody = document.getElementById("historyModalBody");
 
 function getTodayDate() {
   const now = new Date();
@@ -201,47 +196,13 @@ function sortHistoryByDateDesc() {
   dayHistory.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-function closeHistoryMenu() {
-  historySelectMenu.classList.add("hidden");
+function formatDateForDisplay(dateString) {
+  const [year, month, day] = dateString.split("-");
+  if (!year || !month || !day) return dateString;
+  return `${day}.${month}.${year}`;
 }
 
-function updateHistoryTriggerText() {
-  if (!selectedHistoryDate) {
-    historySelectTrigger.textContent = "Wybierz dzień";
-    return;
-  }
-
-  historySelectTrigger.textContent = selectedHistoryDate;
-}
-
-function renderHistorySelectOptions() {
-  if (dayHistory.length === 0) {
-    historySelectMenu.innerHTML =
-      '<div class="history-option">Historia jest pusta</div>';
-    historySelectTrigger.textContent = "Wybierz dzień";
-    return;
-  }
-
-  historySelectMenu.innerHTML = dayHistory
-    .map(
-      (entry) => `
-      <div class="history-option ${
-        selectedHistoryDate === entry.date ? "active" : ""
-      }" data-history-date="${entry.date}">
-        ${entry.date}
-      </div>
-    `,
-    )
-    .join("");
-
-  updateHistoryTriggerText();
-}
-
-function closeHistoryModal() {
-  historyModal.classList.add("hidden");
-}
-
-function openHistoryModal(day) {
+function buildHistoryDayContent(day) {
   const rows = day.employees
     .map(
       (employee) => `
@@ -255,27 +216,50 @@ function openHistoryModal(day) {
     )
     .join("");
 
-  historyModalTitle.textContent = `Statystyka za ${day.date}`;
-  historyModalBody.innerHTML = `${rows || "<p>W tym dniu nie było pracowników.</p>"}<div class="total">Łączna wypłata za dzień: ${formatMoney(day.grandTotal)}</div>`;
-  historyModal.classList.remove("hidden");
+  return `${rows || "<p>W tym dniu nie było pracowników.</p>"}<div class="total">Łączna wypłata za dzień: ${formatMoney(day.grandTotal)}</div>`;
+}
+
+function renderHistoryDays() {
+  if (dayHistory.length === 0) {
+    historyDaysList.innerHTML =
+      '<p class="history-empty">Historia jest pusta.</p>';
+    return;
+  }
+
+  historyDaysList.innerHTML = dayHistory
+    .map(
+      (entry) => `
+      <article class="history-day ${expandedHistoryDate === entry.date ? "is-open" : ""}">
+        <button class="history-day__trigger" type="button" data-history-date="${entry.date}">
+          ${formatDateForDisplay(entry.date)}
+        </button>
+        <div class="history-day__content ${expandedHistoryDate === entry.date ? "" : "hidden"}">
+          ${buildHistoryDayContent(entry)}
+        </div>
+      </article>
+    `,
+    )
+    .join("");
+}
+
+function toggleHistoryDay(date) {
+  const day = dayHistory.find((item) => item.date === date);
+  if (!day) return;
+
+  expandedHistoryDate = expandedHistoryDate === date ? null : date;
+  renderHistoryDays();
 }
 
 function openHistoryByDate(date) {
   const day = dayHistory.find((item) => item.date === date);
   if (!day) return;
 
-  selectedHistoryDate = date;
-  updateHistoryTriggerText();
-  renderHistorySelectOptions();
-  openHistoryModal(day);
+  expandedHistoryDate = date;
+  renderHistoryDays();
 }
 
 function saveCurrentDayToHistory() {
   if (employees.length === 0) {
-    historyModalTitle.textContent = "Statystyka dnia";
-    historyModalBody.innerHTML =
-      "<p>Nie można zapisać dnia: dodaj co najmniej jednego pracownika.</p>";
-    historyModal.classList.remove("hidden");
     return;
   }
 
@@ -289,17 +273,25 @@ function saveCurrentDayToHistory() {
     dayHistory.push(snapshot);
   }
 
-  selectedHistoryDate = date;
+  expandedHistoryDate = date;
   sortHistoryByDateDesc();
   saveHistoryToStorage();
-  renderHistorySelectOptions();
-  openHistoryByDate(date);
+  renderHistoryDays();
+}
+
+function openHistoryModal() {
+  renderHistoryDays();
+  historyModal.classList.remove("hidden");
+}
+
+function closeHistoryModal() {
+  historyModal.classList.add("hidden");
 }
 
 function syncCurrentDayHistory() {
   if (employees.length === 0) return;
 
-  const date = historyDateInput.value || getTodayDate();
+  const date = getTodayDate();
   const snapshot = createDaySnapshot(date);
   const existingIndex = dayHistory.findIndex((item) => item.date === date);
 
@@ -309,13 +301,17 @@ function syncCurrentDayHistory() {
     dayHistory.push(snapshot);
   }
 
-  if (!selectedHistoryDate) {
-    selectedHistoryDate = date;
+  if (!historyDateInput.value || historyDateInput.value !== date) {
+    historyDateInput.value = date;
+  }
+
+  if (!expandedHistoryDate) {
+    expandedHistoryDate = date;
   }
 
   sortHistoryByDateDesc();
   saveHistoryToStorage();
-  renderHistorySelectOptions();
+  renderHistoryDays();
 }
 
 function renderEmployees() {
@@ -546,16 +542,9 @@ calculateAllBtn.addEventListener("click", () => {
     employee.lastResult = calculateEmployee(employee);
   });
   saveEmployeesToStorage();
-  syncCurrentDayHistory();
+  saveCurrentDayToHistory();
   renderEmployees();
-
-  if (!showAllReport) {
-    showAllReport = true;
-    allReport.classList.remove("hidden");
-    toggleAllBtn.textContent = "Ukryj wszystkich kurierów";
-  }
-
-  renderAllReport();
+  openHistoryModal();
 });
 
 toggleAllBtn.addEventListener("click", () => {
@@ -583,33 +572,28 @@ allReportClose.addEventListener("click", () => {
   closeAllReportModal();
 });
 
-saveDayBtn.addEventListener("click", () => {
-  saveCurrentDayToHistory();
-});
-
-historySelectTrigger.addEventListener("click", () => {
-  historySelectMenu.classList.toggle("hidden");
-});
-
-historySelectMenu.addEventListener("click", (event) => {
+historyDaysList.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
 
-  const option = target.closest(".history-option[data-history-date]");
-  if (!(option instanceof HTMLDivElement)) return;
+  const trigger = target.closest(".history-day__trigger[data-history-date]");
+  if (!(trigger instanceof HTMLButtonElement)) return;
 
-  const date = option.dataset.historyDate;
+  const date = trigger.dataset.historyDate;
   if (!date) return;
 
-  closeHistoryMenu();
-  openHistoryByDate(date);
+  toggleHistoryDay(date);
+});
+
+historyQuickOpen.addEventListener("click", () => {
+  openHistoryModal();
 });
 
 historyModal.addEventListener("click", (event) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
 
-  if (target.matches('[data-close-modal="true"]')) {
+  if (target.matches('[data-close-history-modal="true"]')) {
     closeHistoryModal();
   }
 });
@@ -618,33 +602,12 @@ historyModalClose.addEventListener("click", () => {
   closeHistoryModal();
 });
 
-historyQuickOpen.addEventListener("click", () => {
-  if (dayHistory.length === 0) {
-    historyModalTitle.textContent = "Statystyka dnia";
-    historyModalBody.innerHTML = "<p>Historia jest pusta.</p>";
-    historyModal.classList.remove("hidden");
-    return;
-  }
-
-  const dateToOpen = selectedHistoryDate || dayHistory[0].date;
-  openHistoryByDate(dateToOpen);
-});
-
-document.addEventListener("click", (event) => {
-  const target = event.target;
-  if (!(target instanceof Node)) return;
-
-  if (!historySelect.contains(target)) {
-    closeHistoryMenu();
-  }
-});
-
 historyDateInput.value = getTodayDate();
 loadStateFromStorage();
 sortHistoryByDateDesc();
 if (dayHistory.length > 0) {
-  selectedHistoryDate = dayHistory[0].date;
+  expandedHistoryDate = dayHistory[0].date;
 }
 renderEmployees();
 renderManagerEmployees();
-renderHistorySelectOptions();
+renderHistoryDays();

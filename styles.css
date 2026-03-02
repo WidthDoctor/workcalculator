@@ -109,47 +109,40 @@ input {
   margin-bottom: 10px;
 }
 
-.history-select {
-  position: relative;
+.history-days {
+  display: grid;
+  gap: 8px;
 }
 
-.history-select__trigger {
+.history-day {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.history-day__trigger {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px;
-  background: #fff;
+  border: none;
+  background: transparent;
   text-align: left;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.history-select__menu {
-  position: absolute;
-  z-index: 20;
-  left: 0;
-  right: 0;
-  margin-top: 6px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
-  max-height: 220px;
-  overflow-y: auto;
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
-}
-
-.history-option {
   padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  border-bottom: 1px solid var(--border);
 }
 
-.history-option:last-child {
-  border-bottom: none;
+.history-day__content {
+  padding: 0 10px 10px;
+  border-top: 1px solid var(--border);
 }
 
-.history-option:hover,
-.history-option.active {
+.history-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.history-day.is-open,
+.history-day__trigger:hover {
   background: #eff6ff;
 }
 
