@@ -26,16 +26,9 @@ Prosta aplikacja webowa (mobile-first) do rozliczania pracy kurierów.
 2. Otwórz `index.html` w przeglądarce
    lub uruchom przez lokalny serwer (np. Live Server w VS Code).
 
-## Publikacja na GitHub Pages
+## Link do kalkulatora
 
-Repozytorium jest przygotowane do publikacji z gałęzi `gh-pages`.
-
-1. Wejdź w `Settings` → `Pages`.
-2. Wybierz `Deploy from a branch`.
-3. Ustaw gałąź `gh-pages` i folder `/ (root)`.
-4. Zapisz ustawienia i poczekaj na link publikacji.
-
-Docelowy adres zwykle ma formę:
+Kalkulator jest dostępny pod adresem:
 
 `https://widthdoctor.github.io/workcalculator/`
 
